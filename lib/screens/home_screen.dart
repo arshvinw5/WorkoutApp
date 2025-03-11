@@ -50,15 +50,16 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           builder: (context) => AlertDialog(
                 title: Text(
-                  'Add',
+                  'Add workout',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 content: TextField(
                   controller: newWorkoutNameController,
                   decoration: InputDecoration(
-                      labelText: 'Create a workout ?',
+                      labelText: 'Name',
+                      labelStyle: TextStyle(fontWeight: FontWeight.bold),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0))),
+                          borderRadius: BorderRadius.circular(8.0))),
                 ),
                 actions: [
                   //save button

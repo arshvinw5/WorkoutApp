@@ -6,6 +6,7 @@ class ExercisesTitle extends StatelessWidget {
   final int sets;
   final int reps;
   final bool isDone;
+  final Function(bool?)? onCheckBoxFunction;
 
   const ExercisesTitle(
       {super.key,
@@ -13,21 +14,35 @@ class ExercisesTitle extends StatelessWidget {
       required this.weight,
       required this.sets,
       required this.reps,
-      required this.isDone});
+      required this.isDone,
+      required this.onCheckBoxFunction});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0), color: Colors.black12),
       child: ListTile(
         title: Text(exerciseName),
         subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Chip(label: Text('${weight.toString()} kg')),
-            Chip(label: Text('${sets.toString()} sets')),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Chip(
+                  label: Text(
+                '${weight.toString()} kg',
+              )),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Chip(label: Text('${sets.toString()} sets')),
+            ),
             Chip(label: Text('${reps.toString()} reps'))
           ],
         ),
+        trailing: Checkbox(
+            value: isDone, onChanged: (value) => onCheckBoxFunction!(isDone)),
       ),
     );
   }
