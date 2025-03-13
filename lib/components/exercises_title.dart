@@ -19,31 +19,61 @@ class ExercisesTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0), color: Colors.black12),
-      child: ListTile(
-        title: Text(exerciseName),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Chip(
-                  label: Text(
-                '${weight.toString()} kg',
-              )),
+    return isDone
+        ? Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0), color: Colors.red),
+            child: ListTile(
+              title: Text(exerciseName),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Chip(
+                        label: Text(
+                      '${weight.toString()} kg',
+                    )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Chip(label: Text('${sets.toString()} sets')),
+                  ),
+                  Chip(label: Text('${reps.toString()} reps'))
+                ],
+              ),
+              trailing: Checkbox(
+                  value: isDone,
+                  onChanged: (value) => onCheckBoxFunction!(value)),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Chip(label: Text('${sets.toString()} sets')),
+          )
+        : Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                color: Colors.black12),
+            child: ListTile(
+              title: Text(exerciseName),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Chip(
+                        label: Text(
+                      '${weight.toString()} kg',
+                    )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Chip(label: Text('${sets.toString()} sets')),
+                  ),
+                  Chip(label: Text('${reps.toString()} reps'))
+                ],
+              ),
+              trailing: Checkbox(
+                  value: isDone,
+                  onChanged: (value) => onCheckBoxFunction!(value)),
             ),
-            Chip(label: Text('${reps.toString()} reps'))
-          ],
-        ),
-        trailing: Checkbox(
-            value: isDone, onChanged: (value) => onCheckBoxFunction!(isDone)),
-      ),
-    );
+          );
   }
 }

@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:workout_app/data/hive_database.dart';
 import 'package:workout_app/models/exercise.dart';
 import 'package:workout_app/models/workouts.dart';
 
 class WorkoutData extends ChangeNotifier {
+  //creating a db object
+  final db = HiveDatabase();
+
   List<Workouts> workoutsList = [
     Workouts(name: 'Upper Body', exercises: [
       Exercise(name: 'Bicep Curl', weight: 10.5, sets: 3, reps: 12),
     ])
   ];
+
+  //if there is workours already in db then get that workouts list
+
+  void initilaseWorkoutsList() {
+    if (db.previousDataExists()) {
+      workoutsList = db.readFromDatabase();
+      //otherwuse use default workouts
+    } else {
+      db.saveToDatabase(workoutsList);
+    }
+  }
 
   // methd for getting the list of workouts
   List<Workouts> getWorkoutsList() => workoutsList;
@@ -21,6 +36,8 @@ class WorkoutData extends ChangeNotifier {
   //user to add workouts
   void addWorkout(String name) {
     workoutsList.add(Workouts(name: name, exercises: []));
+    //save to db
+    db.saveToDatabase(workoutsList);
     notifyListeners();
   }
 
@@ -32,6 +49,8 @@ class WorkoutData extends ChangeNotifier {
     releventWorkout?.exercises.add(
         Exercise(name: exerciseName, weight: weight, sets: sets, reps: reps));
 
+    //save to db
+    db.saveToDatabase(workoutsList);
     notifyListeners();
   }
 
@@ -45,6 +64,8 @@ class WorkoutData extends ChangeNotifier {
     //to on and off the bool value
     releventExercise?.isDone = !releventExercise.isDone;
 
+    //save to db
+    db.saveToDatabase(workoutsList);
     notifyListeners();
   }
 
