@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
+import 'package:workout_app/components/custom_drawer.dart';
+import 'package:workout_app/components/heat_map.dart';
 import 'package:workout_app/data/workout_data.dart';
+import 'package:workout_app/datetime/date_time.dart';
 import 'package:workout_app/screens/workout_screen.dart';
+import 'package:workout_app/theme/theme_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -83,33 +88,77 @@ class _HomeScreenState extends State<HomeScreen> {
               ));
     }
 
+    final darkTheme = Provider.of<ThemeProvider>(context).isDarkMood;
+
     return Consumer<WorkoutData>(
         builder: (context, value, child) => Scaffold(
-              appBar: AppBar(
-                title: const Text(
-                  'Workout Tracker',
-                ),
+            drawer: CustomDrawer(),
+            appBar: AppBar(),
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: Colors.black,
+              onPressed: createWorkoutDialog,
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
               ),
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: Colors.black,
-                onPressed: createWorkoutDialog,
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-              ),
-              body: ListView.builder(
-                itemCount: value.getWorkoutsList().length,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text(value.getWorkoutsList()[index].name),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios),
-                    onPressed: () => navigateToWorkoutScreen(
-                      value.getWorkoutsList()[index].name,
+            ),
+            body: ListView(
+              children: [
+                //heatmap
+                HeatMapScreen(
+                    datasets: value.heatMapDataSet,
+                    startDateYYYYMMDD: value.getStartDate()),
+                //list of workouts
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: value.getWorkoutsList().length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Slidable(
+                        endActionPane: ActionPane(
+                          motion: const ScrollMotion(),
+                          children: [
+                            SlidableAction(
+                              label: 'Edit',
+                              icon: Icons.edit,
+                              onPressed: (context) {},
+                            ),
+                            SlidableAction(
+                              label: 'Delete',
+                              icon: Icons.delete,
+                              onPressed: (context) {},
+                            ),
+                          ],
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.0),
+                              color: darkTheme
+                                  ? Color(0xFFF0FF42)
+                                  : Colors.black12),
+                          child: ListTile(
+                            title: Text(
+                              value.getWorkoutsList()[index].name,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.arrow_forward_ios),
+                              onPressed: () => navigateToWorkoutScreen(
+                                value.getWorkoutsList()[index].name,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ));
+              ],
+            )));
   }
 }

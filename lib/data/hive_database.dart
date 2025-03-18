@@ -27,7 +27,7 @@ class HiveDatabase {
   }
 
   //write data
-
+  //The function saveToDatabase() converts workout objects into lists of strings and stores them in Hive.
   void saveToDatabase(List<Workouts> workouts) {
     //covert workout object into lists of strings so that can be save in HIVE
     final workoutList = convertObjectToWorkoutList(workouts);
@@ -72,6 +72,7 @@ class HiveDatabase {
               0, // 👈 Convert String to int safely
           isDone: exercisesDetails[i][j][4].toString().toLowerCase() ==
               'true', // 👈 Normalize boolean conversion
+          // 🔹 Load isDone as boolean
         ));
       }
 
@@ -128,6 +129,7 @@ List<String> convertObjectToWorkoutList(List<Workouts> workouts) {
 
 List<List<List<String>>> convertObjectExerciseList(List<Workouts> workouts) {
   //get exercies from each workout
+  //fial out put list
   List<List<List<String>>> exerciseList = [];
 
   //go through the earch work outs

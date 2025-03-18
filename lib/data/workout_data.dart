@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_app/data/hive_database.dart';
+import 'package:workout_app/datetime/date_time.dart';
 import 'package:workout_app/models/exercise.dart';
 import 'package:workout_app/models/workouts.dart';
 
@@ -22,6 +23,9 @@ class WorkoutData extends ChangeNotifier {
     } else {
       db.saveToDatabase(workoutsList);
     }
+
+    //load heat map
+    loadHeatMapData();
   }
 
   // methd for getting the list of workouts
@@ -61,11 +65,15 @@ class WorkoutData extends ChangeNotifier {
   void checkOffExercise(String workoutName, String exerciseName) {
     //find the relevant workout
     Exercise? releventExercise = getReleventExercise(workoutName, exerciseName);
-    //to on and off the bool value
+    //Toggle the value (true <-> false)
     releventExercise?.isDone = !releventExercise.isDone;
 
     //save to db
     db.saveToDatabase(workoutsList);
+
+    //load heat map
+    loadHeatMapData();
+
     notifyListeners();
   }
 
@@ -88,5 +96,48 @@ class WorkoutData extends ChangeNotifier {
     );
 
     return releventExercise;
+  }
+
+  //start date
+  String getStartDate() {
+    return db.getStartDate();
+  }
+
+  Map<DateTime, int> heatMapDataSet = {};
+
+  //heatmap
+  void loadHeatMapData() {
+    DateTime startDate = createDateTineObject(getStartDate());
+
+    //count number of days to load
+    int daysInBetween = DateTime.now().difference(startDate).inDays;
+
+    //go from start date to today, and add each completion status to the datasets list
+    //"COMPLETION_STSTUS_YYYYMMDD" will be the key in the datavbase
+
+    for (int i = 0; i < daysInBetween + 1; i++) {
+      String yyyymmdd =
+          covertDateTimeToYYYYMMDD(startDate.add(Duration(days: i)));
+
+      //complettion status 0 or 1
+
+      int complettionStatus = db.getCompletionStatus(yyyymmdd);
+
+      //year
+
+      int year = startDate.add(Duration(days: i)).year;
+      //month
+
+      int month = startDate.add(Duration(days: i)).month;
+      //day
+      int day = startDate.add(Duration(days: i)).day;
+
+      final precentForEachDay = <DateTime, int>{
+        DateTime(year, month, day): complettionStatus
+      };
+
+      //add to heatmapdataset
+      heatMapDataSet.addEntries(precentForEachDay.entries);
+    }
   }
 }
