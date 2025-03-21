@@ -9,9 +9,13 @@ class WorkoutData extends ChangeNotifier {
   final db = HiveDatabase();
 
   List<Workouts> workoutsList = [
-    Workouts(name: 'Upper Body', exercises: [
-      Exercise(name: 'Bicep Curl', weight: 10.5, sets: 3, reps: 12),
-    ])
+    Workouts(
+        id: 1,
+        name: 'Upper Body',
+        timestamp: DateTime.now().toString(),
+        exercises: [
+          Exercise(name: 'Bicep Curl', weight: 10.5, sets: 3, reps: 12),
+        ])
   ];
 
   //if there is workours already in db then get that workouts list
@@ -39,7 +43,11 @@ class WorkoutData extends ChangeNotifier {
 
   //user to add workouts
   void addWorkout(String name) {
-    workoutsList.add(Workouts(name: name, exercises: []));
+    int newId = DateTime.now().millisecondsSinceEpoch;
+    String timestamp = DateTime.now().toIso8601String();
+
+    workoutsList.add(
+        Workouts(id: newId, name: name, exercises: [], timestamp: timestamp));
     //save to db
     db.saveToDatabase(workoutsList);
     notifyListeners();

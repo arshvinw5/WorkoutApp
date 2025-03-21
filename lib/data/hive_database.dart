@@ -77,8 +77,12 @@ class HiveDatabase {
       }
 
       //create individual workouts
-      Workouts workout =
-          Workouts(name: workoutNames[i], exercises: exercisesInEachWorkouts);
+      Workouts workout = Workouts(
+        id: int.tryParse(workoutNames[i][0]) ?? 0,
+        name: workoutNames[i][1],
+        exercises: exercisesInEachWorkouts,
+        timestamp: workoutNames[i][2],
+      );
 
       mySavedWorkouts.add(workout);
     }
@@ -114,12 +118,15 @@ class HiveDatabase {
 //we need this to store date in Hive as string
 //covert workout object into a list -> eg [upperbody , lowrbody]
 
-List<String> convertObjectToWorkoutList(List<Workouts> workouts) {
-  List<String> workoutList = [];
+List<List<String>> convertObjectToWorkoutList(List<Workouts> workouts) {
+  List<List<String>> workoutList = [];
 
-  for (int i = 0; i < workouts.length; i++) {
-    // 🔥 Fix: loop over workouts, not workoutList
-    workoutList.add(workouts[i].name);
+  for (var workout in workouts) {
+    workoutList.add([
+      workout.id.toString(), // Store ID
+      workout.name,
+      workout.timestamp, // Store timestamp
+    ]);
   }
 
   return workoutList;

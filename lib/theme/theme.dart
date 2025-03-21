@@ -25,3 +25,12 @@ ThemeData darkMode = ThemeData(
         secondary: Colors.grey.shade700,
         tertiary: Colors.grey.shade600,
         inversePrimary: Colors.grey.shade300));
+
+
+
+
+//FE4F2D
+//Color(0xFFF0FF42)
+// background : FDFBEE
+
+//#c0f360

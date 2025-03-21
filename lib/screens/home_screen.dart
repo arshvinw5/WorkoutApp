@@ -56,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(
             builder: (context) => WorkoutScreen(workoutName: workoutName)));
 
+    void deleteWorkout(String workoutName) {}
+
     //create workout dialog box
     void createWorkoutDialog() {
       showDialog(
@@ -129,7 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             SlidableAction(
                               label: 'Delete',
                               icon: Icons.delete,
-                              onPressed: (context) {},
+                              onPressed: (context) =>
+                                  deleteWorkout(value.workoutsList[index].name),
                             ),
                           ],
                         ),
@@ -146,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black),
                             ),
+                            subtitle: Text(value.workoutsList[index].timestamp),
                             trailing: IconButton(
                               icon: const Icon(Icons.arrow_forward_ios),
                               onPressed: () => navigateToWorkoutScreen(
