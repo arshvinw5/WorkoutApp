@@ -2,7 +2,7 @@ import 'package:workout_app/models/exercise.dart';
 
 class Workouts {
   final int id;
-  final String name;
+  String name;
   final List<Exercise> exercises;
   final String timestamp;
 

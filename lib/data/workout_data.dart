@@ -93,6 +93,14 @@ class WorkoutData extends ChangeNotifier {
     return releventWorkout;
   }
 
+  //getting relevelt workout by iD
+  Workouts? getReleventWorkoutById(int id) {
+    Workouts? releventWorkoutById = workoutsList.firstWhere(
+      (workout) => workout.id == id,
+    );
+    return releventWorkoutById;
+  }
+
   //reurn the exercise object givin the name
   Exercise? getReleventExercise(String workoutName, String exerciseName) {
     //find the relevent workout
@@ -147,5 +155,19 @@ class WorkoutData extends ChangeNotifier {
       //add to heatmapdataset
       heatMapDataSet.addEntries(precentForEachDay.entries);
     }
+  }
+
+  //to delete a workout
+  void deleteWorkout(int id) {
+    workoutsList.removeWhere((workout) => workout.id == id);
+    db.saveToDatabase(workoutsList);
+    notifyListeners();
+  }
+
+  void updateWorkoutName(int id, String newName) {
+    Workouts? releventWorkout = getReleventWorkoutById(id);
+    releventWorkout?.name = newName;
+    db.saveToDatabase(workoutsList);
+    notifyListeners();
   }
 }

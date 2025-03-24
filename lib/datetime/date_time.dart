@@ -59,3 +59,20 @@ String covertDateTimeToYYYYMMDD(DateTime datetime) {
 
   return yyyymmdd;
 }
+
+String formatDateTime(DateTime dateTime) {
+  String year = dateTime.year.toString();
+  String month =
+      dateTime.month.toString().padLeft(2, '0'); // Ensures 2-digit format
+  String day = dateTime.day.toString().padLeft(2, '0');
+  String hour = (dateTime.hour % 12 == 0 ? 12 : dateTime.hour % 12).toString();
+  String minute = dateTime.minute.toString().padLeft(2, '0');
+  String period = dateTime.hour >= 12 ? 'PM' : 'AM';
+
+  return "$year-$month-$day $hour:$minute $period";
+}
+
+
+// .padLeft(2, '0') → Ensures values like 9 become 09
+// dateTime.hour % 12 == 0 ? 12 : dateTime.hour % 12 → Handles 12-hour format
+// Uses AM/PM instead of military time

@@ -56,7 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(
             builder: (context) => WorkoutScreen(workoutName: workoutName)));
 
-    void deleteWorkout(String workoutName) {}
+    void deleteWorkout(int id) {
+      Provider.of<WorkoutData>(context, listen: false).deleteWorkout(id);
+    }
 
     //create workout dialog box
     void createWorkoutDialog() {
@@ -97,11 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
             drawer: CustomDrawer(),
             appBar: AppBar(),
             floatingActionButton: FloatingActionButton(
-              backgroundColor: Colors.black,
               onPressed: createWorkoutDialog,
               child: const Icon(
                 Icons.add,
-                color: Colors.white,
               ),
             ),
             body: ListView(
@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               label: 'Delete',
                               icon: Icons.delete,
                               onPressed: (context) =>
-                                  deleteWorkout(value.workoutsList[index].name),
+                                  deleteWorkout(value.workoutsList[index].id),
                             ),
                           ],
                         ),
@@ -149,7 +149,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black),
                             ),
-                            subtitle: Text(value.workoutsList[index].timestamp),
+                            subtitle: Text(formatDateTime(DateTime.parse(
+                                    value.getWorkoutsList()[index].timestamp)
+                                .toLocal())),
                             trailing: IconButton(
                               icon: const Icon(Icons.arrow_forward_ios),
                               onPressed: () => navigateToWorkoutScreen(

@@ -52,7 +52,7 @@ class HiveDatabase {
   List<Workouts> readFromDatabase() {
     List<Workouts> mySavedWorkouts = [];
 
-    List<String> workoutNames = _myBox.get('WORKOUTS');
+    List<dynamic> workoutNames = _myBox.get('WORKOUTS');
     final exercisesDetails = _myBox.get('EXERCISES');
 
     //create workout objects
