@@ -29,20 +29,20 @@ class _HomeScreenState extends State<HomeScreen> {
     final newWorkoutNameController = TextEditingController();
 
     //method to clearn controller
-    void clearController() {
-      newWorkoutNameController.clear();
-    }
+    // void clearController() {
+    //   newWorkoutNameController.clear();
+    // }
 
     //saving method
-    void saveWorkout() {
-      String newWorkoutName = newWorkoutNameController.text;
-      //add workout to list
-      Provider.of<WorkoutData>(context, listen: false)
-          .addWorkout(newWorkoutName);
-      //pop dialog box
-      Navigator.pop(context);
-      clearController();
-    }
+    // void saveWorkout() {
+    //   String newWorkoutName = newWorkoutNameController.text;
+    //   //add workout to list
+    //   Provider.of<WorkoutData>(context, listen: false)
+    //       .addWorkout(newWorkoutName);
+    //   //pop dialog box
+    //   Navigator.pop(context);
+    //   clearController();
+    // }
 
     //cancel method
 
@@ -61,12 +61,38 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     //create workout dialog box
-    void createWorkoutDialog() {
+    void createWorkoutDialog(WorkoutDialogType type,
+        {int? id, String? currentName}) {
+      void saveWorkout() {
+        String newWorkoutName = newWorkoutNameController.text;
+
+        if (type == WorkoutDialogType.add) {
+          //add to workoutlist
+          Provider.of<WorkoutData>(context, listen: false)
+              .addWorkout(newWorkoutName);
+        } else if (type == WorkoutDialogType.edit && id != null) {
+          //update to workoutlist
+          Provider.of<WorkoutData>(context, listen: false)
+              .updateWorkoutName(id, newWorkoutName);
+        }
+
+        //close dialog box and clear controller
+        Navigator.pop(context);
+        newWorkoutNameController.clear();
+      }
+
+      //cancel method
+      void cancelWorkout() {
+        Navigator.pop(context);
+      }
+
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
                 title: Text(
-                  'Add workout',
+                  type == WorkoutDialogType.add
+                      ? 'Add workout'
+                      : "Edit Workout: ${currentName.toString()}",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 content: TextField(
@@ -99,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
             drawer: CustomDrawer(),
             appBar: AppBar(),
             floatingActionButton: FloatingActionButton(
-              onPressed: createWorkoutDialog,
+              onPressed: () => createWorkoutDialog(WorkoutDialogType.add),
               child: const Icon(
                 Icons.add,
               ),
@@ -126,7 +152,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             SlidableAction(
                               label: 'Edit',
                               icon: Icons.edit,
-                              onPressed: (context) {},
+                              onPressed: (context) => createWorkoutDialog(
+                                WorkoutDialogType.edit,
+                                id: value.workoutsList[index].id,
+                                currentName: value.workoutsList[index].name,
+                              ),
                             ),
                             SlidableAction(
                               label: 'Delete',
@@ -168,3 +198,5 @@ class _HomeScreenState extends State<HomeScreen> {
             )));
   }
 }
+
+enum WorkoutDialogType { add, edit }
