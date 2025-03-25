@@ -145,47 +145,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: value.getWorkoutsList().length,
                     itemBuilder: (context, index) => Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Slidable(
-                        endActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          children: [
-                            SlidableAction(
-                              label: 'Edit',
-                              icon: Icons.edit,
-                              onPressed: (context) => createWorkoutDialog(
-                                WorkoutDialogType.edit,
-                                id: value.workoutsList[index].id,
-                                currentName: value.workoutsList[index].name,
+                      child: GestureDetector(
+                        onTap: () => navigateToWorkoutScreen(
+                            value.getWorkoutsList()[index].name),
+                        child: Slidable(
+                          endActionPane: ActionPane(
+                            motion: const ScrollMotion(),
+                            children: [
+                              SlidableAction(
+                                label: 'Edit',
+                                icon: Icons.edit,
+                                onPressed: (context) => createWorkoutDialog(
+                                  WorkoutDialogType.edit,
+                                  id: value.workoutsList[index].id,
+                                  currentName: value.workoutsList[index].name,
+                                ),
                               ),
-                            ),
-                            SlidableAction(
-                              label: 'Delete',
-                              icon: Icons.delete,
-                              onPressed: (context) =>
-                                  deleteWorkout(value.workoutsList[index].id),
-                            ),
-                          ],
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                              color: darkTheme
-                                  ? Color(0xFFF0FF42)
-                                  : Colors.black12),
-                          child: ListTile(
-                            title: Text(
-                              value.getWorkoutsList()[index].name,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                            subtitle: Text(formatDateTime(DateTime.parse(
-                                    value.getWorkoutsList()[index].timestamp)
-                                .toLocal())),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.arrow_forward_ios),
-                              onPressed: () => navigateToWorkoutScreen(
+                              SlidableAction(
+                                label: 'Delete',
+                                icon: Icons.delete,
+                                onPressed: (context) =>
+                                    deleteWorkout(value.workoutsList[index].id),
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: darkTheme
+                                    ? Color(0xFFF0FF42)
+                                    : Colors.black12),
+                            child: ListTile(
+                              title: Text(
                                 value.getWorkoutsList()[index].name,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              subtitle: Text(
+                                formatDateTime(DateTime.parse(value
+                                        .getWorkoutsList()[index]
+                                        .timestamp)
+                                    .toLocal()),
+                                style: TextStyle(color: Colors.black),
                               ),
                             ),
                           ),

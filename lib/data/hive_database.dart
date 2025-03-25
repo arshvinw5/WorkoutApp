@@ -63,16 +63,18 @@ class HiveDatabase {
       for (int j = 0; j < exercisesDetails[i].length; j++) {
         // Fix loop condition
         exercisesInEachWorkouts.add(Exercise(
-          name: exercisesDetails[i][j][0],
-          weight: double.tryParse(exercisesDetails[i][j][1].toString()) ??
+          id: int.tryParse(exercisesDetails[i][j][0].toString()) ?? 0,
+          name: exercisesDetails[i][j][1],
+          weight: double.tryParse(exercisesDetails[i][j][2].toString()) ??
               0.0, // 👈 Convert String to double safely
-          sets: int.tryParse(exercisesDetails[i][j][2].toString()) ??
+          sets: int.tryParse(exercisesDetails[i][j][3].toString()) ??
               0, // 👈 Convert String to int safely
-          reps: int.tryParse(exercisesDetails[i][j][3].toString()) ??
+          reps: int.tryParse(exercisesDetails[i][j][4].toString()) ??
               0, // 👈 Convert String to int safely
-          isDone: exercisesDetails[i][j][4].toString().toLowerCase() ==
-              'true', // 👈 Normalize boolean conversion
+          isDone: exercisesDetails[i][j][5].toString().toLowerCase() ==
+              'false', // 👈 Normalize boolean conversion
           // 🔹 Load isDone as boolean
+          timestamp: exercisesDetails[i][j][6],
         ));
       }
 
@@ -150,11 +152,13 @@ List<List<List<String>>> convertObjectExerciseList(List<Workouts> workouts) {
       List<String> individualExercise = [];
 
       individualExercise.addAll([
+        exerciseInWorkouts[j].id.toString(),
         exerciseInWorkouts[j].name,
         exerciseInWorkouts[j].weight.toString(),
         exerciseInWorkouts[j].sets.toString(),
         exerciseInWorkouts[j].reps.toString(),
-        exerciseInWorkouts[j].isDone.toString()
+        exerciseInWorkouts[j].isDone.toString(),
+        exerciseInWorkouts[j].timestamp
       ]);
 
       individualWorkout.add(individualExercise);

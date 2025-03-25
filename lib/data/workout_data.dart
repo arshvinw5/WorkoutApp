@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:workout_app/data/hive_database.dart';
 import 'package:workout_app/datetime/date_time.dart';
@@ -14,7 +16,13 @@ class WorkoutData extends ChangeNotifier {
         name: 'Upper Body',
         timestamp: DateTime.now().toString(),
         exercises: [
-          Exercise(name: 'Bicep Curl', weight: 10.5, sets: 3, reps: 12),
+          Exercise(
+              id: 1,
+              name: 'Bicep Curl',
+              weight: 10.5,
+              sets: 3,
+              reps: 12,
+              timestamp: DateTime.now().toString()),
         ])
   ];
 
@@ -56,10 +64,17 @@ class WorkoutData extends ChangeNotifier {
   //add exercise to workout
   void addExerciseToWorkout(String workoutName, String exerciseName,
       double weight, int sets, int reps) {
+    int newId = DateTime.now().millisecondsSinceEpoch;
+    String timestamp = DateTime.now().toIso8601String();
     Workouts? releventWorkout = getReleventWorkout(workoutName);
 
-    releventWorkout?.exercises.add(
-        Exercise(name: exerciseName, weight: weight, sets: sets, reps: reps));
+    releventWorkout?.exercises.add(Exercise(
+        id: newId,
+        name: exerciseName,
+        weight: weight,
+        sets: sets,
+        reps: reps,
+        timestamp: timestamp));
 
     //save to db
     db.saveToDatabase(workoutsList);
@@ -162,6 +177,20 @@ class WorkoutData extends ChangeNotifier {
     workoutsList.removeWhere((workout) => workout.id == id);
     db.saveToDatabase(workoutsList);
     notifyListeners();
+  }
+
+  //to delete an exercise
+  void deleteExercise(int workoutId, int exerciseId) {
+    Workouts? releventWorkout = getReleventWorkoutById(workoutId);
+
+    if (releventWorkout != null) {
+      releventWorkout.exercises
+          .removeWhere((exercise) => exercise.id == exerciseId);
+
+      //save and update the list
+      db.saveToDatabase(workoutsList);
+      notifyListeners();
+    }
   }
 
   void updateWorkoutName(int id, String newName) {
