@@ -51,10 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     //method to drop into workout screen
-    void navigateToWorkoutScreen(String workoutName) => Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => WorkoutScreen(workoutName: workoutName)));
+    void navigateToWorkoutScreen(int workoutId, String workoutName) =>
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => WorkoutScreen(
+                    workoutId: workoutId, workoutName: workoutName)));
 
     void deleteWorkout(int id) {
       Provider.of<WorkoutData>(context, listen: false).deleteWorkout(id);
@@ -147,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: GestureDetector(
                         onTap: () => navigateToWorkoutScreen(
+                            value.workoutsList[index].id,
                             value.getWorkoutsList()[index].name),
                         child: Slidable(
                           endActionPane: ActionPane(

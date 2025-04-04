@@ -72,9 +72,14 @@ class HiveDatabase {
           reps: int.tryParse(exercisesDetails[i][j][4].toString()) ??
               0, // 👈 Convert String to int safely
           isDone: exercisesDetails[i][j][5].toString().toLowerCase() ==
-              'false', // 👈 Normalize boolean conversion
+              'true', // 👈 Normalize boolean conversion
           // 🔹 Load isDone as boolean
-          timestamp: exercisesDetails[i][j][6],
+          timestamp:
+              exercisesDetails[i][j][6] ?? DateTime.now().toIso8601String(),
+          editedTime: exercisesDetails[i][j].length > 7 &&
+                  exercisesDetails[i][j][7] != null
+              ? exercisesDetails[i][j][7] // Load stored editedTime if available
+              : exercisesDetails[i][j][6], // Default
         ));
       }
 
@@ -114,6 +119,12 @@ class HiveDatabase {
     //return 0 or 1 , if null then return 0
     int completionStatus = _myBox.get('COMPLETION_STATUS_$yyyymmdd') ?? 0;
     return completionStatus;
+  }
+
+//never use this
+  void resetDatabase() async {
+    await _myBox.clear();
+    print("Hive database has been reset.");
   }
 }
 
@@ -158,7 +169,8 @@ List<List<List<String>>> convertObjectExerciseList(List<Workouts> workouts) {
         exerciseInWorkouts[j].sets.toString(),
         exerciseInWorkouts[j].reps.toString(),
         exerciseInWorkouts[j].isDone.toString(),
-        exerciseInWorkouts[j].timestamp
+        exerciseInWorkouts[j].timestamp,
+        exerciseInWorkouts[j].editedTime
       ]);
 
       individualWorkout.add(individualExercise);

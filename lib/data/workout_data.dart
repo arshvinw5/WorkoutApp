@@ -17,12 +17,13 @@ class WorkoutData extends ChangeNotifier {
         timestamp: DateTime.now().toString(),
         exercises: [
           Exercise(
-              id: 1,
-              name: 'Bicep Curl',
-              weight: 10.5,
-              sets: 3,
-              reps: 12,
-              timestamp: DateTime.now().toString()),
+            id: 1,
+            name: 'Bicep Curl',
+            weight: 10.5,
+            sets: 3,
+            reps: 12,
+            timestamp: DateTime.now().toString(),
+          ),
         ])
   ];
 
@@ -61,11 +62,12 @@ class WorkoutData extends ChangeNotifier {
     notifyListeners();
   }
 
-  //add exercise to workout
+  // add exercise to workout
   void addExerciseToWorkout(String workoutName, String exerciseName,
       double weight, int sets, int reps) {
     int newId = DateTime.now().millisecondsSinceEpoch;
     String timestamp = DateTime.now().toIso8601String();
+
     Workouts? releventWorkout = getReleventWorkout(workoutName);
 
     releventWorkout?.exercises.add(Exercise(
@@ -74,9 +76,11 @@ class WorkoutData extends ChangeNotifier {
         weight: weight,
         sets: sets,
         reps: reps,
-        timestamp: timestamp));
+        timestamp: timestamp,
+        editedTime: timestamp // Ensure editedTime is initialized
+        ));
 
-    //save to db
+    // save to db
     db.saveToDatabase(workoutsList);
     notifyListeners();
   }
@@ -124,6 +128,16 @@ class WorkoutData extends ChangeNotifier {
     //find the relevent exercise
     Exercise? releventExercise = releventWorkout?.exercises.firstWhere(
       (exercise) => exercise.name == exerciseName,
+    );
+
+    return releventExercise;
+  }
+
+  Exercise? getReleventExerciseById(int workoutId, int exerciseId) {
+    Workouts? releventWorkout = getReleventWorkoutById(workoutId);
+
+    Exercise? releventExercise = releventWorkout?.exercises.firstWhere(
+      (exercise) => exercise.id == exerciseId,
     );
 
     return releventExercise;
@@ -197,6 +211,50 @@ class WorkoutData extends ChangeNotifier {
     Workouts? releventWorkout = getReleventWorkoutById(id);
     releventWorkout?.name = newName;
     db.saveToDatabase(workoutsList);
+    notifyListeners();
+  }
+
+  void updateExercise(
+    int workoutId,
+    int exerciseId,
+    String? newExerciseName,
+    double? newWeight,
+    int? newSets,
+    int? newReps,
+  ) {
+    String editedTime = DateTime.now().toIso8601String();
+    Exercise? relevantExercise = getReleventExerciseById(workoutId, exerciseId);
+
+    if (relevantExercise != null) {
+      relevantExercise.name = newExerciseName ?? relevantExercise.name;
+      relevantExercise.weight = newWeight ?? relevantExercise.weight;
+      relevantExercise.sets = newSets ?? relevantExercise.sets;
+      relevantExercise.reps = newReps ?? relevantExercise.reps;
+
+      // Update editedTime only if something changed
+      if (newExerciseName != null ||
+          newWeight != null ||
+          newSets != null ||
+          newReps != null) {
+        relevantExercise.editedTime = editedTime;
+      }
+      db.saveToDatabase(workoutsList);
+      notifyListeners();
+    }
+  }
+
+  bool exercisEditedTime(int workoutId, int exerciseId) {
+    Exercise? relevantExercise = getReleventExerciseById(workoutId, exerciseId);
+
+    // Ensure the exercise exists
+    if (relevantExercise == null) return false;
+
+    // Check if editedTime is different from the original timestamp
+    return relevantExercise.editedTime != relevantExercise.timestamp;
+  }
+
+  void resetDatabase() async {
+    db.resetDatabase();
     notifyListeners();
   }
 }

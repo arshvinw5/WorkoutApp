@@ -4,8 +4,10 @@ import 'package:workout_app/components/exercises_title.dart';
 import 'package:workout_app/data/workout_data.dart';
 
 class WorkoutScreen extends StatefulWidget {
+  final int workoutId;
   final String workoutName;
-  const WorkoutScreen({super.key, required this.workoutName});
+  const WorkoutScreen(
+      {super.key, required this.workoutName, required this.workoutId});
 
   @override
   _WorkoutScreenState createState() => _WorkoutScreenState();
@@ -24,31 +26,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   final setsController = TextEditingController();
   final repsController = TextEditingController();
 
-  //saving method
-  void saveExercise() {
-    String newExerciseController = exerciseNameController.text;
-    String newWeightController = weightController.text;
-    String newSetsController = setsController.text;
-    String newRepsController = repsController.text;
-
-    //add workout to list
-    Provider.of<WorkoutData>(context, listen: false).addExerciseToWorkout(
-        //add to exercise list so we need to convert the string to neccesary type of data
-        widget.workoutName,
-        newExerciseController,
-        double.parse(newWeightController),
-        int.parse(newSetsController),
-        int.parse(newRepsController));
-    //pop dialog box
-    Navigator.pop(context);
-    clearController();
-  }
-
-  //cancel method
-  void cancelExercise() {
-    Navigator.pop(context);
-  }
-
   //method to clearn controller
   void clearController() {
     exerciseNameController.clear();
@@ -57,8 +34,67 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     repsController.clear();
   }
 
+  bool isEditedTime(int workoutId, int exerciseId) {
+    bool isEdited = Provider.of<WorkoutData>(context, listen: false)
+        .exercisEditedTime(workoutId, exerciseId);
+
+    print('Edited: $isEdited');
+    return isEdited;
+  }
+
+  //to delete exercise
+  void deleteExercise(int workoutId, int exerciseId) {
+    Provider.of<WorkoutData>(context, listen: false)
+        .deleteExercise(workoutId, exerciseId);
+  }
+
   //to create a new exrcise
-  void createNewExercise() {
+  void createNewExercise(
+    ExerciseDialogType type, {
+    int? workoutId,
+    int? exerciseId,
+    String? newExerciseName,
+    double? newWeight,
+    int? newSets,
+    int? newReps,
+  }) {
+    //saving method
+    void saveExercise() {
+      String newExerciseController = exerciseNameController.text;
+      String newWeightController = weightController.text;
+      String newSetsController = setsController.text;
+      String newRepsController = repsController.text;
+
+      if (type == ExerciseDialogType.add) {
+        //add workout to list
+        Provider.of<WorkoutData>(context, listen: false).addExerciseToWorkout(
+            //add to exercise list so we need to convert the string to neccesary type of data
+            widget.workoutName,
+            newExerciseController,
+            double.parse(newWeightController),
+            int.parse(newSetsController),
+            int.parse(newRepsController));
+      } else if (type == ExerciseDialogType.edit) {
+        //update to exercise list
+        Provider.of<WorkoutData>(context, listen: false).updateExercise(
+            widget.workoutId,
+            exerciseId!,
+            newExerciseController,
+            double.parse(newWeightController),
+            int.parse(newSetsController),
+            int.parse(newRepsController));
+      }
+
+      //pop dialog box
+      Navigator.pop(context);
+      clearController();
+    }
+
+    //cancel method
+    void cancelExercise() {
+      Navigator.pop(context);
+    }
+
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -80,6 +116,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   //text field for weight
                   TextField(
                     controller: weightController,
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                         labelText: 'Weight',
                         border: OutlineInputBorder(
@@ -91,6 +128,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   //text field for sets
                   TextField(
                     controller: setsController,
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                         labelText: 'Sets',
                         border: OutlineInputBorder(
@@ -102,6 +140,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   //text field for reps
                   TextField(
                       controller: repsController,
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         labelText: 'Reps',
                         border: OutlineInputBorder(
@@ -130,7 +169,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         builder: (context, value, child) => Scaffold(
               floatingActionButton: FloatingActionButton(
                 backgroundColor: Colors.black,
-                onPressed: createNewExercise,
+                onPressed: () => createNewExercise(ExerciseDialogType.add),
                 child: Icon(
                   Icons.add,
                   color: Colors.white,
@@ -155,19 +194,37 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       );
                     } else {
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ExercisesTitle(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ExercisesTitle(
                             exerciseName: workouts.exercises[index].name,
                             weight: workouts.exercises[index].weight,
                             sets: workouts.exercises[index].sets,
                             reps: workouts.exercises[index].reps,
                             isDone: workouts.exercises[index].isDone,
-                            onCheckBoxFunction: (value) => onCheckBoxFunction(
+                            onCheckBoxFunction: (_) => onCheckBoxFunction(
                                 widget.workoutName,
-                                workouts.exercises[index].name)),
-                      );
+                                workouts.exercises[index].name),
+                            onDeleteFunction: () => deleteExercise(
+                                widget.workoutId, workouts.exercises[index].id),
+                            dateTime: workouts.exercises[index].timestamp,
+                            onEditFunction: () => createNewExercise(
+                              ExerciseDialogType.edit,
+                              workoutId: widget.workoutId,
+                              exerciseId: workouts.exercises[index].id,
+                              newExerciseName: workouts.exercises[index].name,
+                              newWeight: workouts.exercises[index].weight,
+                              newSets: workouts.exercises[index].sets,
+                              newReps: workouts.exercises[index].reps,
+                            ),
+                            isEdited: isEditedTime(
+                                widget.workoutId, workouts.exercises[index].id),
+                            editedDateTime:
+                                workouts.exercises[index].editedTime,
+                          ));
                     }
                   }),
             ));
   }
 }
+
+enum ExerciseDialogType { add, edit }
