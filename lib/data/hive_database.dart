@@ -89,6 +89,9 @@ class HiveDatabase {
         name: workoutNames[i][1],
         exercises: exercisesInEachWorkouts,
         timestamp: workoutNames[i][2],
+        editedTime: workoutNames[i].length > 3 && workoutNames[i][3] != null
+            ? workoutNames[i][3] // Load stored editedTime if available
+            : workoutNames[i][2], // Default
       );
 
       mySavedWorkouts.add(workout);
@@ -139,6 +142,7 @@ List<List<String>> convertObjectToWorkoutList(List<Workouts> workouts) {
       workout.id.toString(), // Store ID
       workout.name,
       workout.timestamp, // Store timestamp
+      workout.editedTime
     ]);
   }
 

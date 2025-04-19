@@ -72,6 +72,11 @@ class _HomeScreenState extends State<HomeScreen> {
           //add to workoutlist
           Provider.of<WorkoutData>(context, listen: false)
               .addWorkout(newWorkoutName);
+
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Workout Added'),
+            duration: Duration(seconds: 2),
+          ));
         } else if (type == WorkoutDialogType.edit && id != null) {
           //update to workoutlist
           Provider.of<WorkoutData>(context, listen: false)
@@ -118,6 +123,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   )
                 ],
               ));
+    }
+
+    bool isEdited(int id) {
+      bool isEdited = Provider.of<WorkoutData>(context, listen: false)
+          .workoutEditedTime(id);
+      print('Edited: $isEdited');
+      return isEdited;
     }
 
     final darkTheme = Provider.of<ThemeProvider>(context).isDarkMood;
@@ -185,13 +197,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black),
                               ),
-                              subtitle: Text(
-                                formatDateTime(DateTime.parse(value
-                                        .getWorkoutsList()[index]
-                                        .timestamp)
-                                    .toLocal()),
-                                style: TextStyle(color: Colors.black),
-                              ),
+                              subtitle: isEdited(value.workoutsList[index].id)
+                                  ? Text(
+                                      'Edited: ${formatDateTime(DateTime.parse(value.getWorkoutsList()[index].editedTime).toLocal())}',
+                                      style: TextStyle(color: Colors.black),
+                                    )
+                                  : Text(
+                                      'Created: ${formatDateTime(DateTime.parse(value.getWorkoutsList()[index].timestamp).toLocal())}',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
                             ),
                           ),
                         ),
@@ -205,3 +219,5 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 enum WorkoutDialogType { add, edit }
+
+//toLocal() is a method in Dart (used with DateTime objects) that converts a UTC time to the local time zone of the device running the app.

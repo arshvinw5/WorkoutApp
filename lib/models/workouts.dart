@@ -5,10 +5,12 @@ class Workouts {
   String name;
   final List<Exercise> exercises;
   final String timestamp;
+  String editedTime;
 
   Workouts(
       {required this.id,
       required this.name,
       required this.exercises,
-      required this.timestamp});
+      required this.timestamp,
+      this.editedTime = ''});
 }

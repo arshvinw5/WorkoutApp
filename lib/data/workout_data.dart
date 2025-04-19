@@ -55,8 +55,12 @@ class WorkoutData extends ChangeNotifier {
     int newId = DateTime.now().millisecondsSinceEpoch;
     String timestamp = DateTime.now().toIso8601String();
 
-    workoutsList.add(
-        Workouts(id: newId, name: name, exercises: [], timestamp: timestamp));
+    workoutsList.add(Workouts(
+        id: newId,
+        name: name,
+        exercises: [],
+        timestamp: timestamp,
+        editedTime: timestamp));
     //save to db
     db.saveToDatabase(workoutsList);
     notifyListeners();
@@ -208,10 +212,18 @@ class WorkoutData extends ChangeNotifier {
   }
 
   void updateWorkoutName(int id, String newName) {
+    String editedTime = DateTime.now().toIso8601String();
     Workouts? releventWorkout = getReleventWorkoutById(id);
     releventWorkout?.name = newName;
+    releventWorkout?.editedTime = editedTime;
     db.saveToDatabase(workoutsList);
     notifyListeners();
+  }
+
+  bool workoutEditedTime(int id) {
+    Workouts? releventWorkout = getReleventWorkoutById(id);
+    if (releventWorkout == null) return false;
+    return releventWorkout.editedTime != releventWorkout.timestamp;
   }
 
   void updateExercise(

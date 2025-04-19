@@ -58,36 +58,48 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     int? newSets,
     int? newReps,
   }) {
+    final _formKey = GlobalKey<FormState>();
+
+    //If the user is editing an exercise, then take the current (existing) values of that exercise
+    if (type == ExerciseDialogType.edit) {
+      exerciseNameController.text = newExerciseName ?? '';
+      weightController.text = newWeight?.toString() ?? '';
+      setsController.text = newSets?.toString() ?? '';
+      repsController.text = newReps?.toString() ?? '';
+    }
+
     //saving method
     void saveExercise() {
-      String newExerciseController = exerciseNameController.text;
-      String newWeightController = weightController.text;
-      String newSetsController = setsController.text;
-      String newRepsController = repsController.text;
+      if (_formKey.currentState!.validate()) {
+        String newExerciseController = exerciseNameController.text;
+        String newWeightController = weightController.text;
+        String newSetsController = setsController.text;
+        String newRepsController = repsController.text;
 
-      if (type == ExerciseDialogType.add) {
-        //add workout to list
-        Provider.of<WorkoutData>(context, listen: false).addExerciseToWorkout(
-            //add to exercise list so we need to convert the string to neccesary type of data
-            widget.workoutName,
-            newExerciseController,
-            double.parse(newWeightController),
-            int.parse(newSetsController),
-            int.parse(newRepsController));
-      } else if (type == ExerciseDialogType.edit) {
-        //update to exercise list
-        Provider.of<WorkoutData>(context, listen: false).updateExercise(
-            widget.workoutId,
-            exerciseId!,
-            newExerciseController,
-            double.parse(newWeightController),
-            int.parse(newSetsController),
-            int.parse(newRepsController));
+        if (type == ExerciseDialogType.add) {
+          //add workout to list
+          Provider.of<WorkoutData>(context, listen: false).addExerciseToWorkout(
+              //add to exercise list so we need to convert the string to neccesary type of data
+              widget.workoutName,
+              newExerciseController,
+              double.parse(newWeightController),
+              int.parse(newSetsController),
+              int.parse(newRepsController));
+        } else if (type == ExerciseDialogType.edit) {
+          //update to exercise list
+          Provider.of<WorkoutData>(context, listen: false).updateExercise(
+              widget.workoutId,
+              exerciseId!,
+              newExerciseController,
+              double.parse(newWeightController),
+              int.parse(newSetsController),
+              int.parse(newRepsController));
+        }
+
+        //pop dialog box
+        Navigator.pop(context);
+        clearController();
       }
-
-      //pop dialog box
-      Navigator.pop(context);
-      clearController();
     }
 
     //cancel method
@@ -98,55 +110,94 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Add exercise'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  //text field for exercise name
-                  TextField(
-                    controller: exerciseNameController,
-                    decoration: InputDecoration(
-                        labelText: 'Name',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0))),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  //text field for weight
-                  TextField(
-                    controller: weightController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        labelText: 'Weight',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0))),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  //text field for sets
-                  TextField(
-                    controller: setsController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        labelText: 'Sets',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0))),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  //text field for reps
-                  TextField(
-                      controller: repsController,
+              title: Text(type == ExerciseDialogType.add
+                  ? 'Add exercise'
+                  : 'Edit exercise'),
+              content: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    //text field for exercise name
+                    TextFormField(
+                      controller: exerciseNameController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return type == ExerciseDialogType.add
+                              ? 'Please enter exercise name'
+                              : "Please edit exercise name";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          labelText: 'Name',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0))),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    //text field for weight
+                    TextFormField(
+                      controller: weightController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return type == ExerciseDialogType.add
+                              ? 'Please enter weight'
+                              : "Please edit weight";
+                        }
+                        return null;
+                      },
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Reps',
+                        labelText: 'Weight',
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
-                      ))
-                ],
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    //text field for sets
+                    TextFormField(
+                      controller: setsController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return type == ExerciseDialogType.add
+                              ? 'Please enter sets'
+                              : "Please edit sets";
+                        }
+                        return null;
+                      },
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                          labelText: 'Sets',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0))),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    //text field for reps
+                    TextFormField(
+                        controller: repsController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return type == ExerciseDialogType.add
+                                ? 'Please enter reps'
+                                : "Please edit reps";
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Reps',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                        ))
+                  ],
+                ),
               ),
               actions: [
                 //save button
