@@ -200,18 +200,50 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 ),
               ),
               actions: [
+                //cancel button
+                MaterialButton(
+                  onPressed: cancelExercise,
+                  child: Text('Cancel'),
+                ),
                 //save button
                 MaterialButton(
                   onPressed: saveExercise,
                   child: Text('Save'),
                 ),
-                //cancel button
-                MaterialButton(
-                  onPressed: cancelExercise,
-                  child: Text('Cancel'),
-                )
               ],
             ));
+  }
+
+  //If you want to wait for the dialog to finish and do something afterward based on the result,
+  // then you should mark your function as async and return a Future.
+  // to add best practices
+
+  Future<void> showDeleteConfirmationDialog(int workoutId, int exerciseId) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button for close dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete this item ?'),
+          content: Text('Are you sure you want to delete this exercise ?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                deleteExercise(workoutId, exerciseId);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -255,8 +287,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                             onCheckBoxFunction: (_) => onCheckBoxFunction(
                                 widget.workoutName,
                                 workouts.exercises[index].name),
-                            onDeleteFunction: () => deleteExercise(
-                                widget.workoutId, workouts.exercises[index].id),
+                            onDeleteFunction: () =>
+                                showDeleteConfirmationDialog(widget.workoutId,
+                                    workouts.exercises[index].id),
                             dateTime: workouts.exercises[index].timestamp,
                             onEditFunction: () => createNewExercise(
                               ExerciseDialogType.edit,

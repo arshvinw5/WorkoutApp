@@ -3,6 +3,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_app/data/workout_data.dart';
 import 'package:workout_app/screens/home_screen.dart';
+import 'package:workout_app/screens/splash_screen.dart';
 import 'package:workout_app/theme/theme_provider.dart';
 
 void main() async {
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
           title: 'Workout Tracker',
           debugShowCheckedModeBanner: false,
           theme: themeProvider.themeData,
-          home: const HomeScreen(),
+          home: const SplashScreen(),
         ),
       ),
     );

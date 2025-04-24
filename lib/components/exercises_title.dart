@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 import 'package:workout_app/datetime/date_time.dart';
+import 'package:workout_app/theme/theme_provider.dart';
 
 class ExercisesTitle extends StatelessWidget {
   final String exerciseName;
@@ -33,6 +35,8 @@ class ExercisesTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     print('isEdited: $dateTime');
     print('editedDateTime: $editedDateTime');
+
+    final darkTheme = Provider.of<ThemeProvider>(context).isDarkMood;
     return isDone
         ? Container(
             decoration: BoxDecoration(
@@ -75,27 +79,33 @@ class ExercisesTitle extends StatelessWidget {
         : Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.0),
-                color: Colors.black12),
+                color: darkTheme ? Color(0xFFF0FF42) : Colors.black12),
             child: Slidable(
               endActionPane:
                   ActionPane(motion: const ScrollMotion(), children: [
                 SlidableAction(
+                  borderRadius: BorderRadius.circular(8.0),
                   backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Colors.black,
                   icon: Icons.edit,
                   label: 'Edit',
                   onPressed: (context) => onEditFunction!(),
                 ),
                 SlidableAction(
+                  borderRadius: BorderRadius.circular(8.0),
                   backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Colors.black,
                   icon: Icons.delete,
                   label: 'Delete',
                   onPressed: (context) => onDeleteFunction!(),
                 ),
               ]),
               child: ListTile(
-                title: Text(exerciseName),
+                title: Text(
+                  exerciseName,
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -119,12 +129,17 @@ class ExercisesTitle extends StatelessWidget {
                     SizedBox(height: 10),
                     isEdited
                         ? Text(
-                            'Edited: ${formatDateTime(DateTime.parse(editedDateTime))}')
+                            'Edited: ${formatDateTime(DateTime.parse(editedDateTime))}',
+                            style: TextStyle(color: Colors.black),
+                          )
                         : Text(
-                            'Created: ${formatDateTime(DateTime.parse(dateTime))}'),
+                            'Created: ${formatDateTime(DateTime.parse(dateTime))}',
+                            style: TextStyle(color: Colors.black),
+                          ),
                   ],
                 ),
                 trailing: Checkbox(
+                    side: BorderSide(color: Colors.black, width: 2.0),
                     value: isDone,
                     onChanged: (value) => onCheckBoxFunction!(value)),
               ),
